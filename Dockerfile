@@ -10,6 +10,7 @@ COPY app/ /app/app/
 COPY scripts/ /app/scripts/
 COPY sample_prs/ /app/sample_prs/
 COPY app/templates/ /app/app/templates/
+RUN python scripts/generator.py
 
 # Expose port
 EXPOSE 80

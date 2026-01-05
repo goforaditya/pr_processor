@@ -6,7 +6,10 @@ from reportlab.lib import colors
 from reportlab.platypus import SimpleDocTemplate, Table, TableStyle, Paragraph, Spacer
 from reportlab.lib.styles import getSampleStyleSheet
 
-OUTPUT_DIR = "C:/Users/adity/.gemini/antigravity/scratch/pr_processor/sample_prs"
+# Get the directory where this script is located
+SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
+# Go up one level to project root, then into sample_prs
+OUTPUT_DIR = os.path.join(os.path.dirname(SCRIPT_DIR), "sample_prs")
 
 def create_directory():
     if not os.path.exists(OUTPUT_DIR):

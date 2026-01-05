@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -12,6 +13,7 @@
             --text: #f8fafc;
             --subtext: #94a3b8;
         }
+
         body {
             font-family: 'Inter', sans-serif;
             background-color: var(--bg);
@@ -23,12 +25,19 @@
             align-items: center;
             min-height: 100vh;
         }
-        h1, h2, h3 { color: var(--text); }
+
+        h1,
+        h2,
+        h3 {
+            color: var(--text);
+        }
+
         .container {
             width: 90%;
             max-width: 1200px;
             margin-top: 50px;
         }
+
         .upload-section {
             background-color: var(--card);
             padding: 40px;
@@ -37,10 +46,12 @@
             border: 1px solid #334155;
             box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
         }
+
         input[type="file"] {
             margin: 20px 0;
             color: var(--subtext);
         }
+
         button {
             background-color: var(--primary);
             color: white;
@@ -51,12 +62,16 @@
             cursor: pointer;
             transition: background 0.3s;
         }
-        button:hover { background-color: #4f46e5; }
-        
+
+        button:hover {
+            background-color: #4f46e5;
+        }
+
         .result-section {
             margin-top: 40px;
             display: grid;
-            grid-template-columns: 1fr 1fr; /* Two equal columns for Side-by-Side */
+            grid-template-columns: 1fr 1fr;
+            /* Two equal columns for Side-by-Side */
             gap: 20px;
         }
 
@@ -68,7 +83,8 @@
         }
 
         .comparison-table {
-            grid-column: span 2; /* Full width */
+            grid-column: span 2;
+            /* Full width */
             width: 100%;
             border-collapse: collapse;
             margin-top: 20px;
@@ -76,16 +92,28 @@
             border-radius: 8px;
             overflow: hidden;
         }
-        th, td {
+
+        th,
+        td {
             padding: 12px;
             text-align: left;
             border-bottom: 1px solid #334155;
         }
-        th { background-color: #334155; color: white; }
-        
-        .cheaper { color: #4ade80; font-weight: bold; }
-        .expensive { color: #f87171; }
-        
+
+        th {
+            background-color: #334155;
+            color: white;
+        }
+
+        .cheaper {
+            color: #4ade80;
+            font-weight: bold;
+        }
+
+        .expensive {
+            color: #f87171;
+        }
+
         .summary-box {
             grid-column: span 2;
             background: linear-gradient(135deg, #1e293b, #0f172a);
@@ -97,11 +125,27 @@
         }
     </style>
 </head>
+
 <body>
     <div class="container">
         <div style="text-align: center; margin-bottom: 40px;">
             <h1>Purchase Request Comparator</h1>
-            <p style="color: var(--subtext);">Upload two PDFs to extract and compare pricing instantly with Gemini AI.</p>
+            <p style="color: var(--subtext);">Upload two PDFs to extract and compare pricing instantly with Gemini AI.
+            </p>
+
+            <div
+                style="margin-top: 20px; padding: 15px; background-color: var(--card); display: inline-block; border-radius: 8px; border: 1px solid #334155;">
+                <p style="margin: 0 0 10px 0; font-size: 0.9em; color: var(--subtext);">Need samples? Download these to
+                    test:</p>
+                <div style="display: flex; gap: 15px; justify-content: center;">
+                    <a href="/samples/pr_vendor_a.pdf" target="_blank"
+                        style="color: var(--primary); text-decoration: none; font-size: 0.9em;">Vendor A (Simple)</a>
+                    <a href="/samples/pr_vendor_b.pdf" target="_blank"
+                        style="color: var(--primary); text-decoration: none; font-size: 0.9em;">Vendor B (Cheaper)</a>
+                    <a href="/samples/pr_vendor_c.pdf" target="_blank"
+                        style="color: var(--primary); text-decoration: none; font-size: 0.9em;">Vendor C (Complex)</a>
+                </div>
+            </div>
         </div>
 
         {% if not result %}
@@ -188,4 +232,5 @@
         {% endif %}
     </div>
 </body>
+
 </html>

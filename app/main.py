@@ -17,6 +17,9 @@ os.makedirs(UPLOAD_DIR, exist_ok=True)
 # Templates
 templates = Jinja2Templates(directory="./app/templates")
 
+# Mount samples
+app.mount("/samples", StaticFiles(directory="sample_prs"), name="samples")
+
 # Services
 extractor = PRExtractor()
 
