@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Purchase Request Comparator</title>
+    <style>
+        :root {
+            --primary: #6366f1;
+            --bg: #0f172a;
+            --card: #1e293b;
+            --text: #f8fafc;
+            --subtext: #94a3b8;
+        }
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg);
+            color: var(--text);
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+        }
+        h1, h2, h3 { color: var(--text); }
+        .container {
+            width: 90%;
+            max-width: 1200px;
+            margin-top: 50px;
+        }
+        .upload-section {
+            background-color: var(--card);
+            padding: 40px;
+            border-radius: 12px;
+            text-align: center;
+            border: 1px solid #334155;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+        }
+        input[type="file"] {
+            margin: 20px 0;
+            color: var(--subtext);
+        }
+        button {
+            background-color: var(--primary);
+            color: white;
+            padding: 12px 24px;
+            border: none;
+            border-radius: 6px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+        button:hover { background-color: #4f46e5; }
+        
+        .result-section {
+            margin-top: 40px;
+            display: grid;
+            grid-template-columns: 1fr 1fr; /* Two equal columns for Side-by-Side */
+            gap: 20px;
+        }
+
+        .pr-card {
+            background-color: var(--card);
+            padding: 20px;
+            border-radius: 12px;
+            border: 1px solid #334155;
+        }
+
+        .comparison-table {
+            grid-column: span 2; /* Full width */
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+            background-color: var(--card);
+            border-radius: 8px;
+            overflow: hidden;
+        }
+        th, td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid #334155;
+        }
+        th { background-color: #334155; color: white; }
+        
+        .cheaper { color: #4ade80; font-weight: bold; }
+        .expensive { color: #f87171; }
+        
+        .summary-box {
+            grid-column: span 2;
+            background: linear-gradient(135deg, #1e293b, #0f172a);
+            padding: 20px;
+            border-radius: 12px;
+            text-align: center;
+            border: 1px solid var(--primary);
+            margin-bottom: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div style="text-align: center; margin-bottom: 40px;">
+            <h1>Purchase Request Comparator</h1>
+            <p style="color: var(--subtext);">Upload two PDFs to extract and compare pricing instantly with Gemini AI.</p>
+        </div>
+
+        {% if not result %}
+        <div class="upload-section">
+            <form action="/compare" method="post" enctype="multipart/form-data">
+                <div style="display: flex; justify-content: space-around;">
+                    <div>
+                        <h3>Vendor Quote A</h3>
+                        <input type="file" name="file1" required accept=".pdf">
+                    </div>
+                    <div>
+                        <h3>Vendor Quote B</h3>
+                        <input type="file" name="file2" required accept=".pdf">
+                    </div>
+                </div>
+                <br>
+                <button type="submit">Compare Quotes</button>
+            </form>
+            {% if error %}
+            <p style="color: red; margin-top: 20px;">{{ error }}</p>
+            {% endif %}
+        </div>
+        {% endif %}
+
+        {% if result %}
+        <div class="summary-box">
+            <h2>Best Value: <span style="color: #4ade80; font-size: 1.5em;">{{ result.cheaper_option }}</span></h2>
+            <p>Total Savings: ${{ "%.2f"|format(result.total_diff|abs) }}</p>
+            <a href="/" style="color: var(--primary);">Compare New Files</a>
+        </div>
+
+        <div class="result-section">
+            <!-- PR 1 Details -->
+            <div class="pr-card">
+                <h3>{{ result.vendor1 }} (A)</h3>
+                <p>Total: ${{ "%.2f"|format(data1.grand_total) }}</p>
+                <ul>
+                    {% for item in data1.items %}
+                    <li>{{ item.qty }}x {{ item.name }} @ ${{ item.unit_price }}</li>
+                    {% endfor %}
+                </ul>
+            </div>
+
+            <!-- PR 2 Details -->
+            <div class="pr-card">
+                <h3>{{ result.vendor2 }} (B)</h3>
+                <p>Total: ${{ "%.2f"|format(data2.grand_total) }}</p>
+                <ul>
+                    {% for item in data2.items %}
+                    <li>{{ item.qty }}x {{ item.name }} @ ${{ item.unit_price }}</li>
+                    {% endfor %}
+                </ul>
+            </div>
+
+            <table class="comparison-table">
+                <thead>
+                    <tr>
+                        <th>Item</th>
+                        <th>Price (A)</th>
+                        <th>Price (B)</th>
+                        <th>Difference</th>
+                        <th>Verdict</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for item in result.item_comparison %}
+                    <tr>
+                        <td>{{ item.name }}</td>
+                        <td>{{ "$%.2f"|format(item.price1) if item.price1 else "-" }}</td>
+                        <td>{{ "$%.2f"|format(item.price2) if item.price2 else "-" }}</td>
+                        <td class="{{ 'cheaper' if item.status == 'pr2_cheaper' else 'expensive' }}">
+                            {{ "$%.2f"|format(item.diff) if item.diff is not none else "-" }}
+                        </td>
+                        <td>
+                            {% if item.status == 'pr2_cheaper' %} Quote B is cheaper
+                            {% elif item.status == 'pr1_cheaper' %} Quote A is cheaper
+                            {% else %} Equal {% endif %}
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% endif %}
+    </div>
+</body>
+</html>
